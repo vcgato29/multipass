@@ -145,17 +145,21 @@ parts:
     - -DCMAKE_INSTALL_PREFIX=/
     - -DMULTIPASS_ENABLE_TESTS=off
     override-build: |
-      set -x
-      env
+      ls -l ~/.ccache/
+      du -hcs ~/.ccache/
       which cc
       which c++
-      ls /usr/lib/ccache
-      update-ccache-symlinks || /bin/true
-      env
+      which gcc
+      which g++
+      update-ccache-symlinks
       which cc
       which c++
-      ls /usr/lib/ccache
+      which gcc
+      which g++
       snapcraftctl build
+      ls -l ~/.ccache/
+      du -hcs ~/.ccache/
+      update-ccache-symlinks
       set -e
       mkdir -p ${SNAPCRAFT_PART_INSTALL}/etc/bash_completion.d/
       echo 'export PATH="${PATH}:/snap/bin:/var/lib/snapd/snap/bin"' > ${SNAPCRAFT_PART_INSTALL}/etc/bash_completion.d/snap.multipass
@@ -245,7 +249,20 @@ parts:
       wget http://archive.ubuntu.com/ubuntu/pool/main/libv/libvirt/libvirt_1.3.1-1ubuntu10.24.debian.tar.xz
       wget http://archive.ubuntu.com/ubuntu/pool/main/libv/libvirt/libvirt_1.3.1-1ubuntu10.24.dsc
       dpkg-source -x libvirt*.dsc
+      ls -l ~/.ccache/
+      du -hcs ~/.ccache/
+      which cc
+      which c++
+      which gcc
+      which g++
+      update-ccache-symlinks
+      which cc
+      which c++
+      which gcc
+      which g++
       snapcraftctl build
+      ls -l ~/.ccache/
+      du -hcs ~/.ccache/
     organize:
       # Hack to shift installed libvirt back to root of snap
       # required to ensure that pathing to files etc works at
