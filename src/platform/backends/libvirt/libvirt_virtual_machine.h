@@ -40,7 +40,7 @@ public:
 
     void start() override;
     void stop() override;
-    void shutdown() override;
+    void shutdown(int delay) override;
     State current_state() override;
     int ssh_port() override;
     std::string ssh_hostname() override;

@@ -16,6 +16,7 @@
  */
 
 #include <multipass/backend_utils.h>
+#include <multipass/logging/log.h>
 #include <multipass/utils.h>
 
 #include <fmt/format.h>
@@ -31,6 +32,7 @@
 #include <random>
 
 namespace mp = multipass;
+namespace mpl = multipass::logging;
 
 namespace
 {
@@ -106,4 +108,33 @@ std::string mp::backend::image_format_for(const mp::Path& image_path)
     auto image_record = QJsonDocument::fromJson(image_info.toUtf8(), nullptr).object();
 
     return image_record["format"].toString().toStdString();
+}
+
+void mp::backend::shutdown_instance(const std::string& vm_name, QTimer& delay_shutdown_timer, int delay,
+                                    std::function<void()> const& process_shutdown_request)
+{
+    if (delay > 0)
+    {
+        mpl::log(mpl::Level::info, vm_name, fmt::format("Shutdown request delayed for {} minutes", delay));
+        delay_shutdown_timer.setSingleShot(true);
+        QObject::connect(&delay_shutdown_timer, &QTimer::timeout, process_shutdown_request);
+
+        delay_shutdown_timer.start(delay * 60000);
+    }
+    else if (delay == 0)
+    {
+        process_shutdown_request();
+    }
+    else
+    {
+        if (delay_shutdown_timer.isActive())
+        {
+            mpl::log(mpl::Level::info, vm_name, fmt::format("Canceling delayed shutdown"));
+            delay_shutdown_timer.stop();
+        }
+        else
+        {
+            mpl::log(mpl::Level::warning, vm_name, fmt::format("No delayed shutdown to cancel"));
+        }
+    }
 }

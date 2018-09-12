@@ -1155,7 +1155,7 @@ try // clang-format on
     for (const auto& name : instances_to_recover)
     {
         auto it = deleted_instances.find(name);
-        it->second->shutdown();
+        it->second->shutdown(0);
         vm_instances[name] = std::move(it->second);
         deleted_instances.erase(name);
     }
@@ -1340,7 +1340,7 @@ try // clang-format on
     for (const auto& name : instances_to_stop)
     {
         auto it = vm_instances.find(name);
-        it->second->shutdown();
+        it->second->shutdown(request->time());
     }
 
     return grpc::Status::OK;
@@ -1380,7 +1380,7 @@ try // clang-format on
     for (const auto& name : instances_to_delete)
     {
         auto it = vm_instances.find(name);
-        it->second->shutdown();
+        it->second->shutdown(0);
         if (purge)
         {
             config->factory->remove_resources_for(name);

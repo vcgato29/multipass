@@ -20,6 +20,9 @@
 
 #include <multipass/path.h>
 
+#include <QTimer>
+
+#include <functional>
 #include <string>
 
 namespace multipass
@@ -31,6 +34,8 @@ std::string generate_virtual_bridge_name(const std::string& base_name);
 void check_hypervisor_support();
 void resize_instance_image(const std::string& disk_space, const multipass::Path& image_path);
 std::string image_format_for(const multipass::Path& image_path);
+void shutdown_instance(const std::string& vm_name, QTimer& delay_shutdown_timer, int delay,
+                       std::function<void()> const& process_shutdown_request);
 }
 }
 #endif // MULTIPASS_BACKEND_UTILS_H

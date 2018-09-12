@@ -19,6 +19,7 @@
 
 #include "dnsmasq_server.h"
 
+#include <multipass/backend_utils.h>
 #include <multipass/exceptions/start_exception.h>
 #include <multipass/logging/log.h>
 #include <multipass/ssh/ssh_session.h>
@@ -193,7 +194,7 @@ mp::QemuVirtualMachine::~QemuVirtualMachine()
     remove_tap_device(QString::fromStdString(tap_device_name));
 
     update_shutdown_status = false;
-    shutdown();
+    shutdown(0);
 }
 
 void mp::QemuVirtualMachine::start()
@@ -212,21 +213,23 @@ void mp::QemuVirtualMachine::start()
 
 void mp::QemuVirtualMachine::stop()
 {
-    shutdown();
+    shutdown(0);
 }
 
-void mp::QemuVirtualMachine::shutdown()
+void mp::QemuVirtualMachine::shutdown(int delay)
 {
-    if (state == State::running && vm_process->processId() > 0)
-    {
-        vm_process->write(qmp_execute_json("system_powerdown"));
-        vm_process->waitForFinished();
-    }
-    else
-    {
-        vm_process->terminate();
-        vm_process->waitForFinished();
-    }
+    mp::backend::shutdown_instance(vm_name, delay_shutdown_timer, delay, [this]() {
+        if (state == State::running && vm_process->processId() > 0)
+        {
+            vm_process->write(qmp_execute_json("system_powerdown"));
+            vm_process->waitForFinished();
+        }
+        else
+        {
+            vm_process->terminate();
+            vm_process->waitForFinished();
+        }
+    });
 }
 
 mp::VirtualMachine::State mp::QemuVirtualMachine::current_state()

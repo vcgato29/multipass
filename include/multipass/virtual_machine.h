@@ -20,6 +20,8 @@
 #ifndef MULTIPASS_VIRTUAL_MACHINE_H
 #define MULTIPASS_VIRTUAL_MACHINE_H
 
+#include <QTimer>
+
 #include <chrono>
 #include <memory>
 #include <string>
@@ -46,7 +48,7 @@ public:
     virtual ~VirtualMachine() = default;
     virtual void stop() = 0;
     virtual void start() = 0;
-    virtual void shutdown() = 0;
+    virtual void shutdown(int delay) = 0;
     virtual State current_state() = 0;
     virtual int ssh_port() = 0;
     virtual std::string ssh_hostname() = 0;
@@ -66,6 +68,8 @@ protected:
         : state{State::off}, key_provider{key_provider}, vm_name{vm_name} {};
     VirtualMachine(const VirtualMachine&) = delete;
     VirtualMachine& operator=(const VirtualMachine&) = delete;
+
+    QTimer delay_shutdown_timer;
 };
 }
 #endif // MULTIPASS_VIRTUAL_MACHINE_H

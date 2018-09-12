@@ -264,15 +264,17 @@ void mp::LibVirtVirtualMachine::start()
 
 void mp::LibVirtVirtualMachine::stop()
 {
-    shutdown();
+    shutdown(0);
 }
 
-void mp::LibVirtVirtualMachine::shutdown()
+void mp::LibVirtVirtualMachine::shutdown(int delay)
 {
-    virDomainShutdown(domain.get());
-    state = State::off;
-    update_state();
-    monitor->on_shutdown();
+    mp::backend::shutdown_instance(vm_name, delay_shutdown_timer, delay, [this]() {
+        virDomainShutdown(domain.get());
+        state = State::off;
+        update_state();
+        monitor->on_shutdown();
+    });
 }
 
 mp::VirtualMachine::State mp::LibVirtVirtualMachine::current_state()
