@@ -1233,9 +1233,6 @@ try // clang-format on
             continue;
         }
 
-        if (it->second->current_state() == VirtualMachine::State::running)
-            continue;
-
         vms.push_back(name);
     }
 

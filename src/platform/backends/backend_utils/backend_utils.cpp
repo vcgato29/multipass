@@ -129,7 +129,7 @@ void mp::backend::shutdown_instance(const std::string& vm_name, QTimer& delay_sh
     {
         if (delay_shutdown_timer.isActive())
         {
-            mpl::log(mpl::Level::info, vm_name, fmt::format("Canceling delayed shutdown"));
+            mpl::log(mpl::Level::info, vm_name, fmt::format("Cancelling delayed shutdown"));
             delay_shutdown_timer.stop();
         }
         else

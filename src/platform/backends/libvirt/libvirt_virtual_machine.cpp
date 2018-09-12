@@ -252,7 +252,15 @@ mp::LibVirtVirtualMachine::LibVirtVirtualMachine(const mp::VirtualMachineDescrip
 void mp::LibVirtVirtualMachine::start()
 {
     if (state == State::running)
+    {
+        if (delay_shutdown_timer.isActive())
+        {
+            mpl::log(mpl::Level::info, vm_name, fmt::format("Canceling delayed shutdown"));
+            delay_shutdown_timer.stop();
+        }
+
         return;
+    }
 
     if (virDomainCreate(domain.get()) == -1)
         throw std::runtime_error(virGetLastErrorMessage());

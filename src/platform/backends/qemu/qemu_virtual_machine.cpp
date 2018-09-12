@@ -200,7 +200,15 @@ mp::QemuVirtualMachine::~QemuVirtualMachine()
 void mp::QemuVirtualMachine::start()
 {
     if (state == State::running)
+    {
+        if (delay_shutdown_timer.isActive())
+        {
+            mpl::log(mpl::Level::info, vm_name, fmt::format("Cancelling delayed shutdown"));
+            delay_shutdown_timer.stop();
+        }
+
         return;
+    }
 
     vm_process->start();
     auto started = vm_process->waitForStarted();
